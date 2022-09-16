@@ -38,7 +38,7 @@ app.post('/games/:id/ads', async (request, response) =>{
       weekDays: body.weekDays.join(','),
       hourStart: convertHourStringToMinutes(body.hourStart),
       hourEnd: convertHourStringToMinutes(body.hourEnd),
-      useVoiceChannel: body.useVoiceChannel
+      useVoiceChannel: body.useVoiceChannel,
     }
   })
 

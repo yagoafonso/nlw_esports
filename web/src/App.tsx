@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useKeenSlider } from "keen-slider/react"
 import "keen-slider/keen-slider.min.css";
 import * as Dialog from '@radix-ui/react-dialog';
+import * as ReactDOM from 'react-dom';
 import axios  from 'axios';
 
 import { CreateAdBanner } from './components/CreateAdBanner';
@@ -12,6 +13,7 @@ import { GameBanner } from './components/GameBanner';
 import './styles/main.css';
 
 import logoImg from './assets/logo-nlw-esports.svg';
+import { ArrowCircleRight } from 'phosphor-react';
 
 interface Game {
   id: string;
@@ -26,55 +28,127 @@ interface Game {
 function App() {
   const [games, setGames] = useState<Game[]>([])
 
-  const animation = { duration: 20000, easing: (t: number) => t };
-
   useEffect(() => {
     axios('http://localhost:3333/games').then(response => {
       setGames(response.data)
     })
   }, [])
-
-  const [sliderRef] = useKeenSlider<HTMLDivElement>({
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
+    initial: 0,
+    dragSpeed: 3,
     loop: true,
-    renderMode: "performance",
-    drag: false,
+    slideChanged(slider) {
+      setCurrentSlide(slider.track.details.rel)
+    },
+    created() {
+      setLoaded(true)
+    },
     slides: {
-      perView: 5,
-      origin: 'auto',
-      spacing: 20,
+      perView: 2,
+      spacing: 12,
     },
-    created(s) {
-      s.moveToIdx(5, true, animation);
+    breakpoints: {
+      "(min-width: 425px)": {
+        slides: {
+          perView: 2,
+          spacing: 18,
+        },
+      },
+      "(min-width: 640px)": {
+        slides: {
+          perView: 3,
+          spacing: 16,
+        },
+      },
+      "(min-width: 768px)": {
+        slides: {
+          perView: 4,
+          spacing: 18,
+        },
+      },
+      "(min-width: 1024px)": {
+        slides: {
+          perView: 5,
+          spacing: 20,
+        },
+      },
+      "(min-width: 1280px)": {
+        slides:{
+          perView: 6,
+          spacing: 24,
+        },
+      },
     },
-    updated(s) {
-      s.moveToIdx(s.track.details.abs + 5, true, animation);
-    },
-    animationEnded(s) {
-      s.moveToIdx(s.track.details.abs + 5, true, animation);
-    }
-  });
+  })
+
+  function Arrow(props: {disabled: boolean, left?: boolean, onClick: (event: any) => void }){
+    const disabeld = props.disabled ? " arrow--disabled" : ""
+    return(
+        <svg
+        onClick={props.onClick}
+        className={`arrow ${
+          props.left ? "arrow--left" : "arrow--right"
+        } ${disabeld}`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        
+      >
+        {props.left && (
+          <path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z" />
+        )}
+        {!props.left && (
+          <path d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z" />
+        )}
+      </svg>
+    )
+
+  }
 
 
   return (
-   <div className="max-w-[1280px] mx-auto flex flex-col items-center justify-center my-20">
-    <img src={logoImg} alt="" />
+   <div className="max-w-[1334px] mx-auto flex flex-col items-center justify-center my-20">
+    <img src={logoImg} alt="Logotipo da página Esports NLW" />
       <h1 className="text-6xl text-white font-black mt-20">
         Seu <span className="text-transparent bg-nlw-gradient bg-clip-text">duo</span> está aqui.
       </h1>
 
-      <div ref={sliderRef} className="keen-slider max-w-[1280px]flex mt-16">
-        {games.map(game => {
-          return (
-            <GameBanner
-              key={game.id} 
-              title={game.title}
-              bannerUrl={game.bannerUrl}
-              adsCount={game._count.ads}
-            />
-          );
-        })}
-        
-      </div>
+    <div className="w-full max-w-[1334px] flex items-center gap-3 overflow-hidden mt-16">
+
+        {loaded && instanceRef.current && (
+            <>
+              <Arrow
+                left
+                onClick={(e: any) =>
+                  e.stopPropagation() || instanceRef.current?.prev()
+                }
+                disabled={currentSlide === 0}
+              />
+            </>
+        )}  
+      <div ref={sliderRef} className="keen-slider">
+          {games.map(game => {
+            return (
+              <GameBanner
+                key={game.id} 
+                title={game.title}
+                bannerUrl={game.bannerUrl}
+                adsCount={game._count.ads}
+              />
+            );
+          })}
+        </div>
+
+        <Arrow
+          onClick={(e: any) =>
+            e.stopPropagation() || instanceRef.current?.next()
+          }
+          disabled={currentSlide === 0}
+        />
+
+    </div>
+    
 
       <Dialog.Root>
         <CreateAdBanner />

@@ -87,4 +87,6 @@ app.get('/ads/:id/discord', (request, response) => __awaiter(void 0, void 0, voi
         discord: ad.discord,
     });
 }));
-app.listen(3333);
+app.listen(process.env.PORT || 3333, () => {
+    console.log("Servidor on!");
+});

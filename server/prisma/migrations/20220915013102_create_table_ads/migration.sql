@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "Ad" (
+CREATE TABLE IF NOT EXISTS "Ad" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "gameId" TEXT NOT NULL,
     "name" TEXT NOT NULL,

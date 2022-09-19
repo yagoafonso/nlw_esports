@@ -29,7 +29,7 @@ function App() {
   const [games, setGames] = useState<Game[]>([])
 
   useEffect(() => {
-    axios('http://localhost:3333/games').then(response => {
+    axios('https://nlwesports-production-13e7.up.railway.app/games').then(response => {
       setGames(response.data)
     })
   }, [])

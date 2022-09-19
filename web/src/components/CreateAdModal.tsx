@@ -18,7 +18,7 @@ export function CreateAdModal (){
   const [useVoiceChannel, setUseVoiceChannel] =  useState(false)
   
   useEffect(() => {
-    axios("http://localhost:3333/games").then(response => setGames(response.data))
+    axios("https://nlwesports-production-13e7.up.railway.app/games").then(response => setGames(response.data))
   }, [])
 
   async function handleCreateAd(event: FormEvent) {
@@ -30,7 +30,7 @@ export function CreateAdModal (){
       return;
     }
     try {
-      await axios.post(`http://localhost:3333/games/${data.game}/ads`,{
+      await axios.post(`https://nlwesports-production-13e7.up.railway.app/games/${data.game}/ads`,{
         name: data.name,
         yearsPlaying: Number(data.yearsPlaying),
         discord: data.discord,
